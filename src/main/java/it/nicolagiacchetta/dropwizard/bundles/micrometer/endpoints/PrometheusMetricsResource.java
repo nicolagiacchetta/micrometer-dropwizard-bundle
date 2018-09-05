@@ -13,12 +13,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("prometheus")
+
+@Path("")
 public class PrometheusMetricsResource {
 
     private PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
 
     public PrometheusMetricsResource(MicrometerPrometheusConfiguration configuration) {
+
         if(configuration.isJvmMemoryMetricsEnabled()) {
             new JvmMemoryMetrics().bindTo(prometheusRegistry);
         }
