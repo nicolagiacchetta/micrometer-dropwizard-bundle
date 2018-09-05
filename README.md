@@ -1,8 +1,10 @@
 # Micrometer Dropwizard Bundle
 [![Build Status](https://travis-ci.org/nicolagiacchetta/micrometer-dropwizard-bundle.svg?branch=master)](https://travis-ci.org/nicolagiacchetta/micrometer-dropwizard-bundle)
 
-A [Dropwizard](https://www.dropwizard.io/) bundle for [Micrometer](https://micrometer.io/). 
+A basic [Dropwizard](https://www.dropwizard.io/) bundle for [Micrometer](https://micrometer.io/). 
 
+## About this Repo
+The main purpose of this repo is to provide an example of how I have plugged Micrometer to a Dropwizard application. Currently the bundle only supports the capability to expose some JVM metrics of the service in the [Prometheus](https://prometheus.io/) format.  
 
 ## Getting started
 ### Building from Source
@@ -57,6 +59,5 @@ micrometerBundle:
     jvmGcMetricsEnabled: true
     jvmThreadMetricsEnabled: false
 ```
-None of the parameter is mandatory: a default value is always provided. For instance for the `path` field the default value is `/micrometer/prometheus/`.
-
+None of the parameter is mandatory: a default value is always provided. For instance for the `path` field of the `prometheus` node the default value is `/micrometer/prometheus/`.
 
