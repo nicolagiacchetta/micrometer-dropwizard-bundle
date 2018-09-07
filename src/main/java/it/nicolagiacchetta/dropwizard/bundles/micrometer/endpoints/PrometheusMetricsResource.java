@@ -1,11 +1,6 @@
 package it.nicolagiacchetta.dropwizard.bundles.micrometer.endpoints;
 
-import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
-import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
-import it.nicolagiacchetta.dropwizard.bundles.micrometer.config.MicrometerPrometheusConfiguration;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,28 +12,25 @@ import javax.ws.rs.core.Response;
 @Path("")
 public class PrometheusMetricsResource {
 
-    private PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+    private PrometheusMeterRegistry prometheusMeterRegistry;
 
-    public PrometheusMetricsResource(MicrometerPrometheusConfiguration configuration) {
-
-        if(configuration.isJvmMemoryMetricsEnabled()) {
-            new JvmMemoryMetrics().bindTo(prometheusRegistry);
-        }
-
-        if(configuration.isJvmGcMetricsEnabled()) {
-            new JvmGcMetrics().bindTo(prometheusRegistry);
-        }
-
-        if(configuration.isJvmThreadMetricsEnabled()) {
-            new JvmThreadMetrics().bindTo(prometheusRegistry);
-        }
+    public PrometheusMetricsResource(PrometheusMeterRegistry prometheusMeterRegistry) {
+        this.prometheusMeterRegistry = prometheusMeterRegistry;
     }
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getMetrics() {
-        String response = prometheusRegistry.scrape();
+        String response = prometheusMeterRegistry.scrape();
         return Response.status(200).entity(response).build();
+    }
+
+    public PrometheusMeterRegistry getPrometheusMeterRegistry() {
+        return prometheusMeterRegistry;
+    }
+
+    public void setPrometheusMeterRegistry(PrometheusMeterRegistry prometheusMeterRegistry) {
+        this.prometheusMeterRegistry = prometheusMeterRegistry;
     }
 }
 

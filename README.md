@@ -55,9 +55,13 @@ micrometerBundle:
   prometheus:
     path: metrics/prometheus
     name: Metrics in Prometheus format
+    prefix: some-prefix
+    processorMetricsEnabled: true
     jvmMemoryMetricsEnabled: true
     jvmGcMetricsEnabled: true
     jvmThreadMetricsEnabled: false
+    classLoaderMetricsEnabled: false
 ```
-None of the parameter is mandatory: a default value is always provided. For instance for the `path` field of the `prometheus` node the default value is `/micrometer/prometheus/`.
+None of the parameter is mandatory: a default value is always provided. For instance for the `path` field of the `prometheus` node the default value is `/micrometer/prometheus/`. The default value of all the boolean flags is `true`.
 
+To provide full access to the `PrometheusMeterRegistry`, the `MicrometerBundle` exposes a setter and a getter method. A `PrometheusMeterRegistryBuilder` is also provided in order to facilitate the construction of custom `io.micrometer.prometheus.PrometheusMeterRegistry`. 

@@ -5,10 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MicrometerPrometheusConfiguration {
 
     @JsonProperty
-    private String name = "";
+    private String name;
 
     @JsonProperty
-    private String path = "";
+    private String path;
+
+    @JsonProperty
+    private String prefix;
+
+    @JsonProperty
+    private boolean processorMetricsEnabled = true;
 
     @JsonProperty
     private boolean jvmMemoryMetricsEnabled = true;
@@ -19,12 +25,23 @@ public class MicrometerPrometheusConfiguration {
     @JsonProperty
     private boolean jvmThreadMetricsEnabled = true;
 
+    @JsonProperty
+    private boolean classLoaderMetricsEnabled = true;
+
     public String getName() {
         return name;
     }
 
     public String getPath() {
         return path;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public boolean isProcessorMetricsEnabled() {
+        return processorMetricsEnabled;
     }
 
     public boolean isJvmMemoryMetricsEnabled() {
@@ -38,4 +55,9 @@ public class MicrometerPrometheusConfiguration {
     public boolean isJvmThreadMetricsEnabled() {
         return jvmThreadMetricsEnabled;
     }
+
+    public boolean isClassLoaderMetricsEnabled() {
+        return classLoaderMetricsEnabled;
+    }
+
 }

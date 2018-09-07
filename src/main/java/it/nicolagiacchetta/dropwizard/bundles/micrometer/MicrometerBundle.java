@@ -8,6 +8,7 @@ import io.dropwizard.jersey.setup.JerseyContainerHolder;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import it.nicolagiacchetta.dropwizard.bundles.micrometer.config.MicrometerBundleConfiguration;
 import it.nicolagiacchetta.dropwizard.bundles.micrometer.config.MicrometerPrometheusConfiguration;
 import it.nicolagiacchetta.dropwizard.bundles.micrometer.endpoints.PrometheusMetricsResource;
@@ -15,6 +16,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 import static it.nicolagiacchetta.dropwizard.bundles.micrometer.utils.DropwizardUtils.adaptFormatUrlPattern;
@@ -23,6 +25,8 @@ import static it.nicolagiacchetta.dropwizard.bundles.micrometer.utils.StringUtil
 public class MicrometerBundle<T extends Configuration> implements ConfiguredBundle<T>{
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MicrometerBundle.class);
+
+    private PrometheusMetricsResource prometheusMetricsResource;
 
     private Function<T, MicrometerBundleConfiguration> configurationSupplier;
 
@@ -42,7 +46,9 @@ public class MicrometerBundle<T extends Configuration> implements ConfiguredBund
         String name = isNullOrEmpty(prometheusConf.getName()) ? "Prometheus Metrics" : prometheusConf.getName();
         String path = isNullOrEmpty(prometheusConf.getPath()) ? "/micrometer/prometheus/*" : adaptFormatUrlPattern(prometheusConf.getPath());
         LOGGER.debug("...attempting to register Prometheus resource to path={}...", path);
-        registerAdminResource(environment, name, path, new PrometheusMetricsResource(prometheusConf));
+        PrometheusMeterRegistry prometheusMeterRegistry = new PrometheusMeterRegistryBuilder(prometheusConf).build();
+        this.prometheusMetricsResource = new PrometheusMetricsResource(prometheusMeterRegistry);
+        registerAdminResource(environment, name, path, this.prometheusMetricsResource);
         LOGGER.debug("...Prometheus resource registered to environment.");
     }
 
@@ -64,5 +70,21 @@ public class MicrometerBundle<T extends Configuration> implements ConfiguredBund
         JerseyEnvironment jerseyEnvironment = new JerseyEnvironment(jerseyContainerHolder, jerseyConfig);
         jerseyEnvironment.register(resource);
         environment.admin().addServlet(name, jerseyContainerHolder.getContainer()).addMapping(urlPattern);
+    }
+
+    public void setPrometheusMeterRegistry(PrometheusMeterRegistry prometheusMeterRegistry) {
+        Objects.requireNonNull(prometheusMeterRegistry);
+        requirePrometheusMetricsResourceNonNull();
+        this.prometheusMetricsResource.setPrometheusMeterRegistry(prometheusMeterRegistry);
+    }
+
+    public PrometheusMeterRegistry getPrometheusMeterRegistry() {
+        requirePrometheusMetricsResourceNonNull();
+        return this.prometheusMetricsResource.getPrometheusMeterRegistry();
+    }
+
+    private void requirePrometheusMetricsResourceNonNull() {
+        if(this.prometheusMetricsResource == null)
+            throw new IllegalStateException();
     }
 }
